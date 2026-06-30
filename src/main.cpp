@@ -1,6 +1,8 @@
 #include "SPI.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
+#include <WiFi.h>
+#include "WifiCredentials.h"
 
 // For the Adafruit shield, these are the default.
 #define TFT_DC    6      // GPIO6
@@ -22,8 +24,8 @@ Adafruit_ILI9341 tft(TFT_CS, TFT_DC);
 extern uint8_t epd_bitmap_cpu[];
 extern uint8_t epd_bitmap_flower[];
 
-const char* ssid = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
+const char* ssid = SSID;
+const char* password = PASSWORD;
 
 // Forward declarations for benchmark/test functions
 unsigned long testFillScreen();
@@ -31,7 +33,22 @@ unsigned long testText();
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("ILI9341 Test!"); 
+  
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  
+  // Wait for connection
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print("Connecting to ");
+    Serial.println(ssid);
+  
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("\nWiFi connected.");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
  
   tft.begin();
 
